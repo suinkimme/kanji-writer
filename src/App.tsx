@@ -4,9 +4,9 @@ import { Kanjiwriter } from '@/components';
 function App() {
   return (
     <>
-      <Kanjiwriter value="日" />
-      <Kanjiwriter value="日" size={200} />
-      <Kanjiwriter value="日本語" />
+      <Kanjiwriter>日</Kanjiwriter>
+      <Kanjiwriter size={200}>日</Kanjiwriter>
+      <Kanjiwriter>日本語</Kanjiwriter>
     </>
   );
 }
