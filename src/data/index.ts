@@ -1,22 +1,39 @@
-// Import all .svg files in the folder as raw strings
-const modules = import.meta.glob('./kanji/*.svg', { as: 'raw', eager: true });
+// Lazy import: Only load SVG files when needed
+const modules = import.meta.glob('./kanji/*.svg', { as: 'raw', eager: false });
 
-// Object to map "日" → "<svg>...</svg>" format
-export const kanjiSVGs: Record<string, string> = {};
+// Cache for already loaded SVGs
+const kanjiSVGCache: Record<string, string> = {};
 
-// Convert "./kanji/065e5.svg" → "065e5" → "日"
-for (const path in modules) {
-  const filename = path.split('/').pop()?.replace('.svg', '');
-  if (!filename) continue;
+// Convert Unicode character to hex filename
+const charToHex = (char: string): string => {
+  const codepoint = char.codePointAt(0);
+  if (!codepoint) return '';
+  return codepoint.toString(16).padStart(5, '0');
+};
+
+// Get SVG for a kanji character (lazy load)
+export const getKanjiSVG = async (char: string): Promise<string | undefined> => {
+  // Return from cache if already loaded
+  if (kanjiSVGCache[char]) {
+    return kanjiSVGCache[char];
+  }
+
+  // Convert character to hex filename
+  const hex = charToHex(char);
+  const path = `./kanji/${hex}.svg`;
+
+  // Check if the file exists in the glob pattern
+  if (!(path in modules)) {
+    return undefined;
+  }
 
   try {
-    // Convert filename (hexadecimal) → Unicode character
-    const codepoint = parseInt(filename, 16);
-    const char = String.fromCodePoint(codepoint);
-    kanjiSVGs[char] = modules[path] as string;
+    // Dynamically import the SVG file
+    const svg = (await modules[path]()) as string;
+    kanjiSVGCache[char] = svg;
+    return svg;
   } catch (err) {
-    console.warn(`Failed to parse ${filename}`, err);
+    console.warn(`Failed to load SVG for ${char} (${hex})`, err);
+    return undefined;
   }
-}
-
-export const getKanjiSVG = (char: string): string | undefined => kanjiSVGs[char];
+};
