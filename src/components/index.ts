@@ -1,1 +1,1 @@
-export * from './KanjiWriter';
+export * from './Kanjiwriter';

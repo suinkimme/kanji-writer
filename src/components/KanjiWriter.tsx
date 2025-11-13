@@ -6,12 +6,12 @@ interface Props {
   size?: number;
 }
 
-export function KanjiWriter({ value, size = 100 }: Props) {
+export function Kanjiwriter({ value, size = 100 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (size <= 0 || !Number.isInteger(size)) {
-      console.warn('KanjiWriter: size must be a positive integer');
+      console.warn('Kanjiwriter: size must be a positive integer');
       return;
     }
 
