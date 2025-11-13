@@ -3,12 +3,18 @@ import { getKanjiSVG } from '@/data';
 
 interface Props {
   value: string;
+  size?: number;
 }
 
-export function KanjiWriter({ value }: Props) {
+export function KanjiWriter({ value, size = 100 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (size <= 0 || !Number.isInteger(size)) {
+      console.warn('KanjiWriter: size must be a positive integer');
+      return;
+    }
+
     getKanjiSVG(value).then(svg => {
       if (!svg || !containerRef.current) return;
 
@@ -18,6 +24,10 @@ export function KanjiWriter({ value }: Props) {
       // DOM에 추가된 후 SVG 요소 가져오기
       const svgElement = container.querySelector('svg');
       if (!svgElement) return;
+
+      // SVG 크기 설정
+      svgElement.setAttribute('width', size.toString());
+      svgElement.setAttribute('height', size.toString());
 
       // 모든 path 요소 찾기 (이미 획순대로 정렬되어 있음)
       const paths = Array.from(svgElement.querySelectorAll('path[id*="-s"]'));
@@ -73,7 +83,7 @@ export function KanjiWriter({ value }: Props) {
         styleElement.textContent = animations.join('\n');
       }
     });
-  }, [value]);
+  }, [value, size]);
 
   return <div ref={containerRef} />;
 }

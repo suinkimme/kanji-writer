@@ -5,6 +5,7 @@ function App() {
   return (
     <>
       <KanjiWriter value="日" />
+      <KanjiWriter value="日" size={200} />
     </>
   );
 }
